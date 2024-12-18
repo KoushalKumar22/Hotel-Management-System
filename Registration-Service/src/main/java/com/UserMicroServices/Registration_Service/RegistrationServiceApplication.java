@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class RegistrationServiceApplication {
+
 	@LoadBalanced
 	@Bean
 	public RestTemplate restTemplate(){
