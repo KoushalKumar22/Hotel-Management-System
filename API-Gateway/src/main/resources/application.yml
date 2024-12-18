@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: Booking-Service
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/booking/**
+        - id: Registration-Service
+          uri: lb://REGISTRATION-SERVICE
+          predicates:
+            - Path=/register/**
+  application:
+    name: API-Gateway
+server:
+  port: 8083
