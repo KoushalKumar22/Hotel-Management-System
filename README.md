@@ -1,4 +1,5 @@
-# Microservices Project with Eureka Server and API Gateway
+# Hotel Management
+### Microservices Project with Eureka Server and API Gateway
 
 This project demonstrates a microservices architecture that includes the following components:
 - **Registration Service**: Handles user registration.
