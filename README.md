@@ -102,7 +102,6 @@ Content-Type: application/json
 
 ## Future Enhancements
 - Add New Services
-- Add Resilience4j
 - Add Splunk
 - Add authentication and authorization using Spring Security and OAuth2.
 
