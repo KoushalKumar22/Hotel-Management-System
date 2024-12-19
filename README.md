@@ -26,7 +26,6 @@ This project demonstrates a microservices architecture that includes the followi
 - **Spring Cloud Gateway** for routing and load balancing.
 - **JPA/Hibernate** for database operations.
 - **postgreSQL** (can be replaced with other databases).
-- **Docker** (optional) for containerization.
 
 ## Prerequisites
 
