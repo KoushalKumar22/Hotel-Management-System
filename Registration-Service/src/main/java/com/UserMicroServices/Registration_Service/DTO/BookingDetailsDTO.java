@@ -11,6 +11,10 @@ public class BookingDetailsDTO {
         this.tableNo = tableNo;
     }
 
+    public BookingDetailsDTO() {
+
+    }
+
     public int getId() {
         return id;
     }

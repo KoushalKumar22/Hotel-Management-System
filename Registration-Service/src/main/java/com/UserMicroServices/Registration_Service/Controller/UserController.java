@@ -5,6 +5,7 @@ import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 import com.UserMicroServices.Registration_Service.External.BookingResponse;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -42,11 +43,26 @@ public class UserController {
         return userRepository.findById(id);
     }
     @GetMapping("/registrationId/{id}")
+    @CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
     public BookingResponse findById(@PathVariable int id) {
         PersonalDetails personalDetails = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         String userServiceUrl = "http://BOOKING-SERVICE/booking/bookingId/" + personalDetails.getId();
         BookingDetailsDTO bookingDetails = restTemplate.getForObject(userServiceUrl, BookingDetailsDTO.class);
+        return new BookingResponse(personalDetails, bookingDetails);
+    }
+
+    //fallback method for circuit breaker
+    public BookingResponse registrationFallback(int id, Throwable throwable){
+        PersonalDetails personalDetails= new PersonalDetails();
+        personalDetails.setId(id);
+        personalDetails.setName("Fallback User");
+        personalDetails.setAddress("Fallback Address");
+        BookingDetailsDTO bookingDetails= new BookingDetailsDTO();
+        bookingDetails.getId();
+        bookingDetails.setRoomNo(0);
+        bookingDetails.setTableNo(0);
+
         return new BookingResponse(personalDetails, bookingDetails);
     }
 
