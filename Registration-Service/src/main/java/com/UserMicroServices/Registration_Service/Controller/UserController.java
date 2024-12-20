@@ -6,6 +6,7 @@ import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 import com.UserMicroServices.Registration_Service.External.BookingResponse;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/register")
@@ -25,25 +27,31 @@ public class UserController {
     PersonalUserRepository userRepository;
     @Autowired
     private RestTemplate restTemplate;
+
     @GetMapping("/test")
     public String test(){
         return "This Is a Test Run From registration service";
     }
+
     @PostMapping("/save")
     public String save(@RequestBody PersonalDetails personalDetails){
         userRepository.save(personalDetails);
         return "Data Saved";
     }
+
     @GetMapping("/all")
     public List<PersonalDetails> findAll(){
         return userRepository.findAll();
     }
+
     @GetMapping("/Id/{id}")
     public Optional<PersonalDetails> findUserById(@PathVariable int id){
         return userRepository.findById(id);
     }
+
     @GetMapping("/registrationId/{id}")
-    @CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
     public BookingResponse findById(@PathVariable int id) {
         PersonalDetails personalDetails = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));

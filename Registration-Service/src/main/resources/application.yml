@@ -36,6 +36,13 @@ resilience4j:
         registerHealthIndicator: true
         slidingWindowType: COUNT_BASED
 
+  retry:
+    instances:
+      registrationIdEvent:
+        maxAttempts: 3
+        waitDuration: 4s
+
+
 management:
   health:
     circuitbreakers:
