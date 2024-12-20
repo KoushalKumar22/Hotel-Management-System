@@ -1,6 +1,5 @@
-package com.UserMicroServices.Registration_Service.External;
+package com.UserMicroServices.Registration_Service.Entity;
 
-import com.UserMicroServices.Booking_Service.Entity.Booking;
 import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 

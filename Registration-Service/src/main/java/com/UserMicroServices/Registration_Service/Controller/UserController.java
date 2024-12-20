@@ -3,9 +3,9 @@ package com.UserMicroServices.Registration_Service.Controller;
 
 import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
-import com.UserMicroServices.Registration_Service.External.BookingResponse;
+import com.UserMicroServices.Registration_Service.Entity.BookingResponse;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,10 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/register")
@@ -74,48 +72,36 @@ public class UserController {
         return new BookingResponse(personalDetails, bookingDetails);
     }
 
-    @GetMapping("/allRegistrations")
-    public List<BookingResponse> findAllRegistrations() {
-        List<PersonalDetails> registrations = userRepository.findAll();
-        String bookingServiceUrl = "http://BOOKING-SERVICE/booking/all";
-        ResponseEntity<List<BookingDetailsDTO>> response = restTemplate.exchange(
-                bookingServiceUrl,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<BookingDetailsDTO>>() {}
-        );
-        List<BookingDetailsDTO> bookingDetailsList = response.getBody();
-        return registrations.stream()
-                .map(registration -> {
-                    BookingDetailsDTO bookingDetails = bookingDetailsList.stream()
-                            .filter(booking -> booking.getId() == registration.getBookingId())
-                            .findFirst()
-                            .orElse(null);
-                    return new BookingResponse(registration, bookingDetails);
-                })
-                .toList();
-    }
-
-
-
-
-
 //    @GetMapping("/allRegistrations")
-//    public List<BookingResponse> findAllRegistrations(){
-//        List<PersonalDetails> registrations= userRepository.findAll();
+//    public List<BookingResponse> findAllRegistrations() {
+//        List<PersonalDetails> registrations = userRepository.findAll();
 //        String bookingServiceUrl = "http://BOOKING-SERVICE/booking/all";
-//        List<BookingDetailsDTO> bookingDetailsList = Arrays.asList(
-//                restTemplate.getForObject(bookingServiceUrl, BookingDetailsDTO.class)
+//        ResponseEntity<List<BookingDetailsDTO>> response = restTemplate.exchange(
+//                bookingServiceUrl,
+//                HttpMethod.GET,
+//                null,
+//                new ParameterizedTypeReference<List<BookingDetailsDTO>>() {}
 //        );
-//        List<BookingResponse> responses = registrations.stream()
-//                .map(registration ->{
+//        List<BookingDetailsDTO> bookingDetailsList = response.getBody();
+//        return registrations.stream()
+//                .map(registration -> {
 //                    BookingDetailsDTO bookingDetails = bookingDetailsList.stream()
-//                            .filter(booking ->booking.getId() == registration.getId())
+//                            .filter(booking -> booking.getId() == registration.getBookingId())
 //                            .findFirst()
 //                            .orElse(null);
 //                    return new BookingResponse(registration, bookingDetails);
 //                })
 //                .toList();
-//        return responses;
 //    }
+
+    private final ConfigurationService configurationService;
+    @Autowired
+    public UserController(ConfigurationService configurationService){
+        this.configurationService = configurationService;
+    }
+
+    @GetMapping("/allRegistrations")
+    public List<BookingResponse> findAllRegistrations(){
+        return configurationService.findAllRegistrations();
+    }
 }
