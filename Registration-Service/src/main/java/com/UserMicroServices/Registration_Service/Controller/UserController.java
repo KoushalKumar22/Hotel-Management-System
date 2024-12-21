@@ -6,7 +6,9 @@ import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 import com.UserMicroServices.Registration_Service.Entity.BookingResponse;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -25,6 +27,12 @@ public class UserController {
     PersonalUserRepository userRepository;
     @Autowired
     private RestTemplate restTemplate;
+
+    private final ConfigurationService configurationService;
+    @Autowired
+    public UserController(ConfigurationService configurationService){
+        this.configurationService = configurationService;
+    }
 
     @GetMapping("/test")
     public String test(){
@@ -47,15 +55,12 @@ public class UserController {
         return userRepository.findById(id);
     }
 
+
     @GetMapping("/registrationId/{id}")
     //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
     @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
-    public BookingResponse findById(@PathVariable int id) {
-        PersonalDetails personalDetails = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        String userServiceUrl = "http://BOOKING-SERVICE/booking/bookingId/" + personalDetails.getId();
-        BookingDetailsDTO bookingDetails = restTemplate.getForObject(userServiceUrl, BookingDetailsDTO.class);
-        return new BookingResponse(personalDetails, bookingDetails);
+    public BookingResponse findById(@PathVariable int id){
+        return configurationService.findById(id);
     }
 
     //fallback method for circuit breaker
@@ -68,11 +73,18 @@ public class UserController {
         bookingDetails.getId();
         bookingDetails.setRoomNo(0);
         bookingDetails.setTableNo(0);
-
         return new BookingResponse(personalDetails, bookingDetails);
     }
 
-//    @GetMapping("/allRegistrations")
+
+    @GetMapping("/allRegistrations")
+    public List<BookingResponse> findAllRegistrations(){
+        return configurationService.findAllRegistrations();
+    }
+
+    //Alternate Approach for Finding all registration
+
+//        @GetMapping("/allRegistrations")
 //    public List<BookingResponse> findAllRegistrations() {
 //        List<PersonalDetails> registrations = userRepository.findAll();
 //        String bookingServiceUrl = "http://BOOKING-SERVICE/booking/all";
@@ -94,14 +106,16 @@ public class UserController {
 //                .toList();
 //    }
 
-    private final ConfigurationService configurationService;
-    @Autowired
-    public UserController(ConfigurationService configurationService){
-        this.configurationService = configurationService;
-    }
+    //Alternate Approach for finding registrations by id
 
-    @GetMapping("/allRegistrations")
-    public List<BookingResponse> findAllRegistrations(){
-        return configurationService.findAllRegistrations();
-    }
+//        @GetMapping("/registrationId/{id}")
+//    //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+//    @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+//    public BookingResponse findById(@PathVariable int id) {
+//        PersonalDetails personalDetails = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Booking not found"));
+//        String userServiceUrl = "http://BOOKING-SERVICE/booking/bookingId/" + personalDetails.getId();
+//        BookingDetailsDTO bookingDetails = restTemplate.getForObject(userServiceUrl, BookingDetailsDTO.class);
+//        return new BookingResponse(personalDetails, bookingDetails);
+//    }
 }
