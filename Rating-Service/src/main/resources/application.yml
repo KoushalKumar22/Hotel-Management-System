@@ -7,7 +7,7 @@ eureka:
   instance:
     hostname: localhost
 server:
-  port: 8081
+  port: 8082
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
@@ -21,4 +21,4 @@ spring:
     properties:
       hibernate:
   application:
-    name: Booking-Service
+    name: Rating-Service

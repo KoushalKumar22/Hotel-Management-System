@@ -10,7 +10,11 @@ spring:
           uri: lb://REGISTRATION-SERVICE
           predicates:
             - Path=/register/**
+        - id: Rating-Service
+          uri: lb://RATING-SERVICE
+          predicates:
+            - Path=/rating/**
   application:
     name: API-Gateway
 server:
-  port: 8083
+  port: 8084

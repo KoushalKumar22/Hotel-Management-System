@@ -1,16 +1,20 @@
 package com.UserMicroServices.Registration_Service.Entity;
 
 import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
-import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
+import com.UserMicroServices.Registration_Service.DTO.RatingsDTO;
 
-public class BookingResponse {
+import java.util.List;
+
+public class CombinedResponse {
     private PersonalDetails personalDetails;
     private BookingDetailsDTO bookingDetails;
+    private List<RatingsDTO> rating;
     //constructor and getter,setter
 
-    public BookingResponse(PersonalDetails personalDetails, BookingDetailsDTO bookingDetails) {
+    public CombinedResponse(PersonalDetails personalDetails, BookingDetailsDTO bookingDetails, List<RatingsDTO> rating) {
         this.personalDetails = personalDetails;
         this.bookingDetails = bookingDetails;
+        this.rating = rating;
     }
 
     public PersonalDetails getPersonalDetails() {
@@ -27,5 +31,13 @@ public class BookingResponse {
 
     public void setBookingDetails(BookingDetailsDTO bookingDetails) {
         this.bookingDetails = bookingDetails;
+    }
+
+    public List<RatingsDTO> getRating() {
+        return rating;
+    }
+
+    public void setRating(List<RatingsDTO> rating) {
+        this.rating = rating;
     }
 }

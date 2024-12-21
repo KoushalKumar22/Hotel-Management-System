@@ -7,7 +7,7 @@ eureka:
   instance:
     hostname: localhost
 server:
-  port: 8888
+  port: 8083
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres

@@ -2,17 +2,13 @@ package com.UserMicroServices.Registration_Service.Controller;
 
 
 import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
+import com.UserMicroServices.Registration_Service.DTO.RatingsDTO;
+import com.UserMicroServices.Registration_Service.Entity.CombinedResponse;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
-import com.UserMicroServices.Registration_Service.Entity.BookingResponse;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -59,33 +55,43 @@ public class UserController {
     @GetMapping("/registrationId/{id}")
     //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
     @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
-    public BookingResponse findById(@PathVariable int id){
+    public CombinedResponse findById(@PathVariable int id){
         return configurationService.findById(id);
     }
-
     //fallback method for circuit breaker
-    public BookingResponse registrationFallback(int id, Throwable throwable){
-        PersonalDetails personalDetails= new PersonalDetails();
+    public CombinedResponse registrationFallback(int id, Throwable throwable) {
+        // Create fallback PersonalDetails
+        PersonalDetails personalDetails = new PersonalDetails();
         personalDetails.setId(id);
         personalDetails.setName("Fallback User");
         personalDetails.setAddress("Fallback Address");
-        BookingDetailsDTO bookingDetails= new BookingDetailsDTO();
-        bookingDetails.getId();
+
+        // Create fallback BookingDetailsDTO
+        BookingDetailsDTO bookingDetails = new BookingDetailsDTO();
+        bookingDetails.setId(0);
         bookingDetails.setRoomNo(0);
         bookingDetails.setTableNo(0);
-        return new BookingResponse(personalDetails, bookingDetails);
+
+        // Create fallback RatingsDTO list
+        List<RatingsDTO> ratings = List.of(
+                new RatingsDTO(0,"0",0,"No Ratings")
+        );
+
+        // Return the fallback response
+        return new CombinedResponse(personalDetails, bookingDetails, ratings);
     }
 
 
+
     @GetMapping("/allRegistrations")
-    public List<BookingResponse> findAllRegistrations(){
+    public List<CombinedResponse> findAllRegistrations(){
         return configurationService.findAllRegistrations();
     }
 
     //Alternate Approach for Finding all registration
 
 //        @GetMapping("/allRegistrations")
-//    public List<BookingResponse> findAllRegistrations() {
+//    public List<CombinedResponse> findAllRegistrations() {
 //        List<PersonalDetails> registrations = userRepository.findAll();
 //        String bookingServiceUrl = "http://BOOKING-SERVICE/booking/all";
 //        ResponseEntity<List<BookingDetailsDTO>> response = restTemplate.exchange(
@@ -101,7 +107,7 @@ public class UserController {
 //                            .filter(booking -> booking.getId() == registration.getBookingId())
 //                            .findFirst()
 //                            .orElse(null);
-//                    return new BookingResponse(registration, bookingDetails);
+//                    return new CombinedResponse(registration, bookingDetails);
 //                })
 //                .toList();
 //    }
@@ -111,11 +117,11 @@ public class UserController {
 //        @GetMapping("/registrationId/{id}")
 //    //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
 //    @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
-//    public BookingResponse findById(@PathVariable int id) {
+//    public CombinedResponse findById(@PathVariable int id) {
 //        PersonalDetails personalDetails = userRepository.findById(id)
 //                .orElseThrow(() -> new RuntimeException("Booking not found"));
 //        String userServiceUrl = "http://BOOKING-SERVICE/booking/bookingId/" + personalDetails.getId();
 //        BookingDetailsDTO bookingDetails = restTemplate.getForObject(userServiceUrl, BookingDetailsDTO.class);
-//        return new BookingResponse(personalDetails, bookingDetails);
+//        return new CombinedResponse(personalDetails, bookingDetails);
 //    }
 }

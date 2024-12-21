@@ -9,6 +9,7 @@
         <module name="Booking-Service" />
         <module name="MainServer" />
         <module name="API-Gateway" />
+        <module name="Rating-Service" />
         <module name="Registration-Service" />
       </profile>
     </annotationProcessing>
@@ -18,6 +19,7 @@
       <module name="API-Gateway" options="-parameters" />
       <module name="Booking-Service" options="-parameters" />
       <module name="MainServer" options="-parameters" />
+      <module name="Rating-Service" options="-parameters" />
       <module name="Registration-Service" options="-parameters" />
     </option>
   </component>
