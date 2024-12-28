@@ -74,6 +74,7 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>Booking-Service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
