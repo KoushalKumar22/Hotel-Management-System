@@ -42,10 +42,17 @@ resilience4j:
         maxAttempts: 3
         waitDuration: 4s
 
+  ratelimiter:
+    instances:
+      registrationRateLimiter:
+        limitRefreshPeriod: 10s
+        limitForPeriod: 2
+        timeoutDuration: 5s
+
 
 management:
   health:
-    circuitbreakers:
+    circuit-breakers:
       enabled: true
   endpoints:
     web:

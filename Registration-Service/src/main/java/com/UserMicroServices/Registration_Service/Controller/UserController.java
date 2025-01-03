@@ -7,6 +7,7 @@ import com.UserMicroServices.Registration_Service.Entity.CombinedResponse;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,8 @@ public class UserController {
 
     @GetMapping("/registrationId/{id}")
     //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
-    @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    //@Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    @RateLimiter(name = "registrationRateLimiter" , fallbackMethod = "registrationFallback")
     public CombinedResponse findById(@PathVariable int id){
         return configurationService.findById(id);
     }
