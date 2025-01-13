@@ -5,20 +5,29 @@ import com.UserMicroServices.Registration_Service.DTO.BookingDetailsDTO;
 import com.UserMicroServices.Registration_Service.DTO.RatingsDTO;
 import com.UserMicroServices.Registration_Service.Entity.CombinedResponse;
 import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
+import com.UserMicroServices.Registration_Service.Exceptions.IdNotFoundException;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
+@Validated
 @RequestMapping("/register")
 public class UserController {
 
+    @Autowired
+    ModelMapper mapper;
     @Autowired
     PersonalUserRepository userRepository;
     @Autowired
@@ -36,7 +45,7 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public String save(@RequestBody PersonalDetails personalDetails){
+    public String save(@Valid @RequestBody PersonalDetails personalDetails){
         userRepository.save(personalDetails);
         return "Data Saved";
     }
@@ -47,20 +56,32 @@ public class UserController {
     }
 
     @GetMapping("/Id/{id}")
-    public Optional<PersonalDetails> findUserById(@PathVariable int id){
-        return userRepository.findById(id);
+    public PersonalDetails findUserById(@PathVariable int id){
+        PersonalDetails personalDetails = userRepository.findById(id)
+                .orElseThrow(() -> new IdNotFoundException("Customer Not Found With ID " + id));
+        return mapper.map(personalDetails, PersonalDetails.class);
     }
 
 
     @GetMapping("/registrationId/{id}")
-    //@CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
-    //@Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    @CircuitBreaker(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
+    @Retry(name = "registrationIdEvent", fallbackMethod = "registrationFallback")
     @RateLimiter(name = "registrationRateLimiter" , fallbackMethod = "registrationFallback")
     public CombinedResponse findById(@PathVariable int id){
-        return configurationService.findById(id);
+        CombinedResponse combinedResponse = configurationService.findById(id);
+        if (combinedResponse == null){
+            throw new IdNotFoundException("NO Registrations Found By ID "+id);
+        }
+        return combinedResponse;
     }
     //fallback method for circuit breaker
     public CombinedResponse registrationFallback(int id, Throwable throwable) {
+
+        System.err.println("Fallback Triggered due to: "+ throwable.getMessage());
+
+        if (throwable instanceof IdNotFoundException){
+            throw (IdNotFoundException) throwable;
+        }
         // Create fallback PersonalDetails
         PersonalDetails personalDetails = new PersonalDetails();
         personalDetails.setId(id);
@@ -87,6 +108,12 @@ public class UserController {
     @GetMapping("/allRegistrations")
     public List<CombinedResponse> findAllRegistrations(){
         return configurationService.findAllRegistrations();
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<String> deleteAllUsers(){
+        configurationService.deleteAllRegistrations();
+        return ResponseEntity.ok("All Records Deleted");
     }
 
     //Alternate Approach for Finding all registration

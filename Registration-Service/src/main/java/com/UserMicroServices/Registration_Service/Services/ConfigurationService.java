@@ -29,6 +29,10 @@ public class ConfigurationService {
     @Autowired
     private PersonalUserRepository userRepository;
 
+    public void deleteAllRegistrations(){
+        userRepository.deleteAll();
+    }
+
     public List<CombinedResponse> findAllRegistrations() {
         List<PersonalDetails> registrations = userRepository.findAll();
         // Use Feign client to fetch booking details

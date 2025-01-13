@@ -13,6 +13,6 @@ public interface BookingServiceClient {
     @GetMapping("/booking/all")
     List<BookingDetailsDTO> getAllBookings();
 
-    @GetMapping("/booking/bookingId/{id}")
-    BookingDetailsDTO getBookingDetailsByUserId(@PathVariable("id")int bookingId);
+    @GetMapping("/booking//userId/{userId}")
+    BookingDetailsDTO getBookingDetailsByUserId(@PathVariable("userId")int userId);
 }
