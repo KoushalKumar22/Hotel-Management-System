@@ -1,38 +1,18 @@
-package com.UserMicroServices.Booking_Service.Entity;
+package com.UserMicroServices.Booking_Service.DTO;
 
-import jakarta.persistence.*;
+public class BookingDTO {
 
-@Entity
-@Table(name = "booking") // Set table name specifically for bookings
-public class Booking {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
     private int userId;
-    @Column(name = "room_no")
     private int roomNo;
-    @Column(name = "table_no")
     private int tableNo;
 
-
-    // Constructors, getters, setters
-
-    public Booking(int id, int userId, int roomNo, int tableNo) {
-        this.id = id;
+    public BookingDTO(int userId, int roomNo, int tableNo) {
         this.userId = userId;
         this.roomNo = roomNo;
         this.tableNo = tableNo;
     }
 
-    public Booking() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public BookingDTO() {
     }
 
     public int getUserId() {

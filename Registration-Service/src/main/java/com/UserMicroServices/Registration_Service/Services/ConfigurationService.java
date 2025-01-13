@@ -40,7 +40,7 @@ public class ConfigurationService {
         return registrations.stream()
                 .map(registration -> {
                     BookingDetailsDTO bookingDetails = bookingDetailsList.stream()
-                            .filter(booking -> booking.getId() == registration.getBookingId()) // Match on bookingId
+                            .filter(booking -> booking.getUserId() == registration.getId())
                             .findFirst()
                             .orElse(null);
                     List<RatingsDTO> userRatings = allRatings.stream()
@@ -55,7 +55,7 @@ public class ConfigurationService {
         PersonalDetails personalDetails = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking Not Found"));
         // Use Feign Client to fetch booking details
-        BookingDetailsDTO bookingDetails = bookingServiceClient.getBookingDetailsById(personalDetails.getBookingId()); // Use bookingId
+        BookingDetailsDTO bookingDetails = bookingServiceClient.getBookingDetailsByUserId(personalDetails.getId());
         // fetch data from Rating Service
         List<RatingsDTO> ratings = ratingServiceClient.getRatingsByUserId(personalDetails.getId());
         return new CombinedResponse(personalDetails, bookingDetails ,ratings);

@@ -1,5 +1,6 @@
 package com.UserMicroServices.Booking_Service.Controller;
 
+import com.UserMicroServices.Booking_Service.DTO.BookingDTO;
 import com.UserMicroServices.Booking_Service.Entity.Booking;
 import com.UserMicroServices.Booking_Service.Repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,11 @@ public class BookingController {
         return "This Is A Test Run Form Booking Service";
     }
     @PostMapping("/save")
-    public String save(@RequestBody Booking booking){
+    public String save(@RequestBody BookingDTO bookingDTO){
+        Booking booking= new Booking();
+        booking.setUserId(bookingDTO.getUserId());
+        booking.setRoomNo(bookingDTO.getRoomNo());
+        booking.setTableNo(bookingDTO.getTableNo());
         bookingRepository.save(booking);
         return "Data Saved";
     }
@@ -28,9 +33,9 @@ public class BookingController {
     public List<Booking> findAll(){
         return bookingRepository.findAll();
     }
-    @GetMapping("/bookingId/{id}")
-    public Booking findByBookingId(@PathVariable int id) {
-        return bookingRepository.findById(id)
+    @GetMapping("/userId/{userId}")
+    public Booking findByBookingId(@PathVariable int userId) {
+        return bookingRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 }

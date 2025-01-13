@@ -1,12 +1,12 @@
 package com.UserMicroServices.Registration_Service.DTO;
 
 public class BookingDetailsDTO {
-    private int id;
+    private int userId;
     private int roomNo;
     private int tableNo;
     // Constructors, getters, and setters
-    public BookingDetailsDTO(int id, int roomNo, int tableNo) {
-        this.id = id;
+    public BookingDetailsDTO(int userId, int roomNo, int tableNo) {
+        this.userId = userId;
         this.roomNo = roomNo;
         this.tableNo = tableNo;
     }
@@ -15,12 +15,12 @@ public class BookingDetailsDTO {
 
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getRoomNo() {

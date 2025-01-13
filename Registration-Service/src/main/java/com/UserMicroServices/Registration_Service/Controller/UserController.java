@@ -8,7 +8,6 @@ import com.UserMicroServices.Registration_Service.Entity.PersonalDetails;
 import com.UserMicroServices.Registration_Service.Repository.PersonalUserRepository;
 import com.UserMicroServices.Registration_Service.Services.ConfigurationService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -70,7 +69,7 @@ public class UserController {
 
         // Create fallback BookingDetailsDTO
         BookingDetailsDTO bookingDetails = new BookingDetailsDTO();
-        bookingDetails.setId(0);
+        bookingDetails.setUserId(0);
         bookingDetails.setRoomNo(0);
         bookingDetails.setTableNo(0);
 

@@ -12,14 +12,12 @@ public class PersonalDetails {
     private String name;
     @Column(name = "address")
     private String address;
-    @Column(name = "booking_id")
-    private int bookingId;
     // Constructors, getters, setters
-    public PersonalDetails(int id, String name, String address, int bookingId) {
+
+    public PersonalDetails(int id, String name, String address) {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.bookingId = bookingId;
     }
 
     public PersonalDetails() {
@@ -47,13 +45,5 @@ public class PersonalDetails {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public int getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(int bookingId) {
-        this.bookingId = bookingId;
     }
 }
